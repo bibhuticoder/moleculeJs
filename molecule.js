@@ -29,12 +29,13 @@
 
         //start the timer here
         moleculesTimer = setInterval(draw, 100);
-      
-        document.getElementsByTagName("body")[0].onmousemove = function(e){            
+     
+        document.getElementsByTagName("body")[0].addEventListener("mousemove", function(e){
             cursor.x = e.pageX;
-            cursor.y = e.pageY;            
-        }
-
+            cursor.y = e.pageY; 
+           
+        });        
+       
         function draw(){
             //clear canvas
             ctx.clearRect(0, 0, Width, Height);
