@@ -2,28 +2,28 @@
    
     window.onload = function(){
         
-        var canvas = document.getElementById("moleculeCanvas");
-        var ctx = canvas.getContext('2d');
+        var canvas;
+        var ctx;
 
         var Width,
             Height,
             i,j,
             molecules = [],
             moleculesTimer,
+            cursor,
             
             //default values: Change according to your need
-            numMolecules = 150,
-            minDistance = 50,
-            moleculeColor = "lightgray",
-            moleculeSpeed = 0.5,
-            moleculeSize = 3;
+            numMolecules = 100,
+            minDistance = 40,
+            moleculeColor = "rgba(255, 255, 255, .5)",
+            moleculeSpeed = 1,            
+            moleculeSizeMax = 5,
+            moleculeSizeMin = 1;
 
+        createCanvas();
+        
         setCanvas();
 
-        // create and push the push the cursor molecule initially
-        var cursor = {size: 1, y: 0, x: 0, speedX: 0, speedY: 0};    
-        molecules.push(cursor);
-        
         // Generate the molecules
         generateMolecules();
 
@@ -50,7 +50,13 @@
 
         function generateMolecules(){
             for(i = 0; i < numMolecules; i++){
-                var newMolecule = {y: generateRandom(0,Height), x: generateRandom(0, Width), speedX: generateRandom(-moleculeSpeed, moleculeSpeed), speedY: generateRandom(-moleculeSpeed, moleculeSpeed)};
+                var newMolecule = {
+                    size :generateRandom(moleculeSizeMin, moleculeSizeMax),
+                    y: generateRandom(0,Height),
+                    x: generateRandom(0, Width), 
+                    speedX: generateRandom(-moleculeSpeed, moleculeSpeed), 
+                    speedY: generateRandom(-moleculeSpeed, moleculeSpeed)
+                };
 
                 if(newMolecule.speedX === 0 ) newMolecule.speedX = moleculeSpeed;
                 if(newMolecule.speedY === 0 ) newMolecule.speedY = moleculeSpeed;
@@ -68,8 +74,13 @@
                 m1.y += m1.speedY;
 
                 ctx.beginPath();           
-                ctx.arc(m1.x, m1.y, moleculeSize, 0, 360);
+                ctx.arc(m1.x, m1.y, m1.size, 0, 360);
                 ctx.stroke();
+                
+                ctx.beginPath(); 
+                ctx.fillStyle = moleculeColor;
+                ctx.arc(m1.x, m1.y, m1.size-1, 0, 360);
+                ctx.fill();
 
                 if(m1.x < 0) m1.speedX = moleculeSpeed;           
                 else if(m1.x > Width) m1.speedX = -moleculeSpeed;
@@ -98,11 +109,14 @@
             }
         }
 
+        function createCanvas(){            
+            canvas = document.createElement("canvas");
+            ctx = canvas.getContext('2d');            
+            document.getElementsByTagName('body')[0].appendChild(canvas);            
+        }
+        
         function setCanvas(){
-           
-            molecules = [];
-            generateMolecules();            
-            
+
             Width = window.innerWidth;
             Height = window.innerHeight;            
             canvas.setAttribute("width", Width);
@@ -113,6 +127,13 @@
             canvas.style.zIndex = -1;
             canvas.style.cursor = "default";
            
+            molecules = [];
+            generateMolecules();            
+            
+            // create and push the push the cursor molecule initially
+            cursor = {size: 1, y: 0, x: 0, speedX: 0, speedY: 0};    
+            molecules.push(cursor);
+                        
         }
 
         window.onresize = function(){            
@@ -120,6 +141,5 @@
         }
        
     };
-    
-    
+   
 }(window, document));
