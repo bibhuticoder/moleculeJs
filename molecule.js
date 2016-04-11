@@ -101,10 +101,13 @@
                      var distance = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
 
                      if(distance < minDistance){
+                        
+                        ctx.lineWidth = Math.random();
                          ctx.beginPath();  
                          ctx.moveTo(m1.x, m1.y); 
                          ctx.lineTo(m2.x, m2.y);                               
                          ctx.stroke(); 
+                         ctx.lineWidth = 1;
                      }
                 }
             }
