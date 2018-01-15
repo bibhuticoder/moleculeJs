@@ -6,7 +6,8 @@ body{
     padding: 0;
     width: 100%;
     height: 100%;
-    background-image: url("back.jpg");
+    background-color: #373737;
+    /* background-image: url("back.jpg"); */
     background-size:cover;
     background-position: center
     

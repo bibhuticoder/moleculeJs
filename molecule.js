@@ -4,20 +4,18 @@
         
         var canvas;
         var ctx;
-
         var Width,
             Height,
             i,j,
             molecules = [],
             moleculesTimer,
-            cursor,
-            
+            cursor,            
             //default values: Change according to your need
-            numMolecules = 100,
-            minDistance = 40,
+            numMolecules = 50,
+            minDistance = 50,
             moleculeColor = "rgba(255, 255, 255, .5)",
-            moleculeSpeed = 1,            
-            moleculeSizeMax = 5,
+            moleculeSpeed = 0.5,            
+            moleculeSizeMax = 3,
             moleculeSizeMin = 1;
 
         createCanvas();
@@ -28,12 +26,12 @@
         generateMolecules();
 
         //start the timer here
-        moleculesTimer = setInterval(draw, 100);
+        draw();
+       // moleculesTimer = setInterval(draw, 100);
      
         document.getElementsByTagName("body")[0].addEventListener("mousemove", function(e){
             cursor.x = e.pageX;
             cursor.y = e.pageY; 
-           
         });        
        
         function draw(){
@@ -43,6 +41,7 @@
             // draw the molecules and their bonds
             ctx.strokeStyle = moleculeColor;        
             drawMolecules();
+            requestAnimationFrame(draw);
         }
 
         function generateRandom(min, max){
@@ -55,12 +54,10 @@
                     size :generateRandom(moleculeSizeMin, moleculeSizeMax),
                     y: generateRandom(0,Height),
                     x: generateRandom(0, Width), 
-                    speedX: generateRandom(-moleculeSpeed, moleculeSpeed), 
-                    speedY: generateRandom(-moleculeSpeed, moleculeSpeed)
+                    vx: Math.random()/2,// generateRandom(-moleculeSpeed, moleculeSpeed), 
+                    vy: Math.random()/2,//generateRandom(-moleculeSpeed, moleculeSpeed),
+                    angle: generateRandom(-Math.PI, Math.PI)
                 };
-
-                if(newMolecule.speedX === 0 ) newMolecule.speedX = moleculeSpeed;
-                if(newMolecule.speedY === 0 ) newMolecule.speedY = moleculeSpeed;
 
                 molecules.push(newMolecule);   
             } 
@@ -69,10 +66,10 @@
         function drawMolecules() {
             for(var length = molecules.length-1, i = length; i >= 0; i--){
 
-                 var m1 = molecules[i];
+                var m1 = molecules[i];
 
-                m1.x += m1.speedX;
-                m1.y += m1.speedY;
+                m1.x += Math.cos(m1.angle) * m1.vx;
+                m1.y += Math.sin(m1.angle) * m1.vy;
 
                 ctx.beginPath();           
                 ctx.arc(m1.x, m1.y, m1.size, 0, 360);
@@ -82,33 +79,27 @@
                 ctx.fillStyle = moleculeColor;
                 ctx.arc(m1.x, m1.y, m1.size-1, 0, 360);
                 ctx.fill();
+                
+                let offset = 20;
+                if(m1.x < -offset || m1.x > Width+offset) m1.vx *= -1;
+                else if(m1.y < -offset || m1.y > Height+offset) m1.vy *= -1;
 
-                if(m1.x < 0) m1.speedX = moleculeSpeed;           
-                else if(m1.x > Width) m1.speedX = -moleculeSpeed;
-                else if(m1.y > Height) m1.speedY = -moleculeSpeed;
-                else if(m1.y < 0) m1.speedY = moleculeSpeed;
 
                 for(var length2 = molecules.length-1, j = length2; j >= 0; j--){
-
-                     var m2 = molecules[j];
-
-                     var x1 = m1.x;
-                     var y1 = m1.y;
-
-                     var x2 = m2.x;
-                     var y2 = m2.y;
-
-                     var distance = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
-
-                     if(distance < minDistance){
-                        
-                        ctx.lineWidth = Math.random();
-                         ctx.beginPath();  
-                         ctx.moveTo(m1.x, m1.y); 
-                         ctx.lineTo(m2.x, m2.y);                               
-                         ctx.stroke(); 
-                         ctx.lineWidth = 1;
-                     }
+                    var m2 = molecules[j];
+                    var x1 = m1.x;
+                    var y1 = m1.y;
+                    var x2 = m2.x;
+                    var y2 = m2.y;
+                    var distance = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
+                    if(distance < minDistance){                        
+                        ctx.lineWidth = 0.4;
+                        ctx.beginPath();  
+                        ctx.moveTo(m1.x, m1.y); 
+                        ctx.lineTo(m2.x, m2.y);                               
+                        ctx.stroke(); 
+                        ctx.lineWidth = 1;
+                    }
                 }
             }
         }
